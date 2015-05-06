@@ -3,10 +3,11 @@ call ClearAllReg
 call SetUpSnake
 Step:
 call CheckDirectionChange 
-;call SnakeMove
+call SnakeMove
 ;call CheckLose
 ;call CheckWin
 ;jmp Step
+jmp Step
 hlt
  ;=================================================================================================
 proc SetUpSnake
@@ -79,19 +80,87 @@ endp SetPoint
 
 
 ;TODO:
-proc CheckDirectionChange
+proc CheckDirectionChange 
+    ;check if keyboard clicked
+    
     mov ah,1h
     int 16h
-    cmp ah,0x48
-    je up
-    hlt  
-    up:
+    jnz getKey
+    jmp Knone
+    
+    getKey:
+    mov ah,0
+    int 16h
+    
+    cmp al,'w'
+    je Kup  
+    cmp al,'a'
+    je Kleft
+    cmp al,'d'
+    je Kright
+    cmp al,'s'
+    je Kdown
+    jmp Knone
+    
+    Kup:
+    mov Direction,1 
+    jmp Knone
+    
+    Kright:
+    mov Direction,2
+    jmp Knone
+          
+    Kdown:
+    mov Direction,3
+    jmp Knone
+    
+    Kleft:
+    mov Direction,4
+     
+    
+    Knone:
      
     ret
     
 endp CheckDirectionChange 
 
 proc SnakeMove
+    cmp Direction,1
+    je up
+    
+    cmp Direction,2
+    je right
+    
+    cmp Direction,3
+    je down
+    
+    cmp Direction,4
+    je left
+    
+    
+    up:
+    dec Head_Y
+    jmp move 
+    right:
+    inc Head_X
+    jmp move
+    down:
+    inc Head_Y
+    jmp move
+    left:
+    dec Head_X
+    
+    
+    move:
+    mov bl, Snake_Color
+    
+    mov dh,Head_Y
+    mov dl,Head_X
+    
+    push bx  
+    push dx
+    call SetPoint
+    
     ret
 endp SnakeMove
 
@@ -114,7 +183,8 @@ Tail_Y db 1
 
 Direction db 2 
 
-Snake_Color db 3h
+Snake_Color db 33h
+SnakeArray dw dup(?)2000
 
 
           
