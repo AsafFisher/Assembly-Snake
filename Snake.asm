@@ -7,6 +7,7 @@ call SnakeMove
 ;call CheckLose
 ;call CheckWin
 ;jmp Step
+call CheckDirectionChange
 jmp Step
 hlt
  ;=================================================================================================
@@ -69,7 +70,7 @@ proc SetPoint
     mov cx, 1 ; print chars
     mov bh, 0
     mov bl, [160] ; green bg/blue fg
-    mov al, '*';0x20 ; blank char
+    mov al, Snake_Shape;'*';0x20 ; blank char
     mov ah, 0x9
     int 0x10
     push [150]
@@ -83,15 +84,16 @@ endp SetPoint
 proc CheckDirectionChange 
     ;check if keyboard clicked
     
-    mov ah,1h
+    mov ah,1h ;Check if any key was pressed in the keyboard!
     int 16h
-    jnz getKey
-    jmp Knone
+    jnz getKey;key was pressed!
+    jmp Knone;key wasent pressed!
     
     getKey:
-    mov ah,0
+    mov ah,0h;Get the key that was pressed!
     int 16h
     
+    ;compiration with al and the key that you need
     cmp al,'w'
     je Kup  
     cmp al,'a'
@@ -123,7 +125,8 @@ proc CheckDirectionChange
     ret
     
 endp CheckDirectionChange 
-
+   
+   
 proc SnakeMove
     cmp Direction,1
     je up
@@ -183,8 +186,16 @@ Tail_Y db 1
 
 Direction db 2 
 
-Snake_Color db 33h
+Snake_Color db 03h
+Snake_Shape db '*'
 SnakeArray dw dup(?)2000
+
+;FOOD VALUE:
+
+Berry db 10d;*
+Apple db 20d;@
+Waffels db 30d;#
+
 
 
           
