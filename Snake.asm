@@ -4,7 +4,7 @@ call SetUpSnake
 Step:
 call CheckDirectionChange 
 call SnakeMove
-;call CheckLose
+call CheckLose
 ;call CheckWin
 ;jmp Step
 call CheckDirectionChange
@@ -12,12 +12,60 @@ jmp Step
 hlt
  ;=================================================================================================
 proc SetUpSnake
-    mov bl, Snake_Color
     
+    
+    BuildField:
+    
+    mov bh, 0
+    mov ah, 0x2
+    int 0x10 
+    ; dh = y
+;     dl = x 
+    mov dl,0
+    mov dh,0  
+    
+    mov cx, 80 ; print chars
+    mov bh, 0
+    mov bl, 20d ; green bg/blue fg
+    mov al, ' ';'*';0x20 ; blank char
+    mov ah, 0x9
+    int 0x10
+     
+    L_drow: 
+    mov cx, 1 ; print chars
+    mov bh, 0
+    mov bl, 20d ;  bg/fg
+    mov al, ' ';'*';0x20 ; blank char
+    mov ah, 0x9
+    int 0x10
+    inc dh
+    mov ah, 0x2
+    int 0x10
+    cmp dh,25d
+    jne L_drow 
+          
+    mov al,79
+    mov dh,0 
+    R_drow: 
+    mov cx, 1 ; print chars
+    mov bh, 0
+    mov bl, 20d ;  bg/fg
+    mov al, ' ';'*';0x20 ; blank char
+    mov ah, 0x9
+    int 0x10
+    inc dh
+    mov ah, 0x2
+    int 0x10
+    cmp dh,25d
+    jne R_drow
+    
+    
+  
+       
+       
+       
     mov dh,Head_Y
-    mov dl,Head_X
-    
-    push bx  
+    mov dl,Head_X  
     push dx
     call SetPoint 
     ret
@@ -56,23 +104,46 @@ endp ClearAllReg
 
 
 
-
+;USE THIS:
+;proc SetPoint
+;    pop [150]
+;    pop dx;place
+;    ; dh = y
+;    ; dl = x  Set cursor to top left-most corner of screen
+;    mov bh, 0
+;    mov ah, 0x2
+;    int 0x10 
+;    
+;    mov cx, 1 ; print chars
+;    mov bh, 0
+;    mov bl, Snake_Color ; green bg/blue fg
+;    mov al, Snake_Shape;'*';0x20 ; blank char
+;    mov ah, 0x9
+;    int 0x10
+;    push [150]
+;    ret
+;endp SetPoint 
 proc SetPoint
     pop [150]
-    pop dx;place
-    pop [160]
-    ; dh = y
-    ; dl = x  Set cursor to top left-most corner of screen
-    mov bh, 0
-    mov ah, 0x2
-    int 0x10 
+    pop dx;place dh = y; dl = x
+    mov al,dh;mov al y value
+    mov bl,80d
+    mul bl
+    add ax,ax
+    add dl,dl
+    mov dh,0
+    add ax,dx
+    mov bx,ax
+     
+    push ds
     
-    mov cx, 1 ; print chars
-    mov bh, 0
-    mov bl, [160] ; green bg/blue fg
-    mov al, Snake_Shape;'*';0x20 ; blank char
-    mov ah, 0x9
-    int 0x10
+    mov cl,Snake_Shape;shape 
+    mov ch,Snake_Color ;color
+    mov ax, 0b800h
+    mov ds,ax
+    ;mov bx,1
+    mov [bx],cx 
+    pop ds
     push [150]
     ret
 endp SetPoint
@@ -169,17 +240,13 @@ proc SnakeMove
     down:;DOWN
     inc Head_Y
     jmp move
-    left:;DOWN
+    left:;LEFT
     dec Head_X
     
     
     move:
-    mov bl, Snake_Color
-    
     mov dh,Head_Y
-    mov dl,Head_X
-    
-    push bx  
+    mov dl,Head_X 
     push dx
     call SetPoint
     
@@ -187,6 +254,28 @@ proc SnakeMove
 endp SnakeMove
 
 proc CheckLose
+    cmp Direction,1
+    je upCheck
+    
+    cmp Direction,2
+    je rightCheck
+    
+    cmp Direction,3
+    je downCheck
+    
+    cmp Direction,4
+    je leftCheck 
+    
+    upCheck:;UP
+    jmp check 
+    rightCheck:;RIGHT
+    jmp check
+    downCheck:;DOWN
+    jmp check
+    leftCheck:;LEFT
+    
+    check:
+    
     ret
 endp CheckLose
 ;====================
@@ -205,7 +294,7 @@ Tail_Y db 1
 
 Direction db 2 
 
-Snake_Color db 03h
+Snake_Color db 11
 Snake_Shape db '*'
 Blank db ''
 SnakeArray dw dup(?)2000
