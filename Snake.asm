@@ -78,8 +78,6 @@ proc SetPoint
 endp SetPoint
 
 
-
-
 ;TODO:
 proc CheckDirectionChange 
     ;check if keyboard clicked
@@ -128,6 +126,26 @@ endp CheckDirectionChange
    
    
 proc SnakeMove
+    ;============ 
+    
+    ;mov al,Snake_Shape
+;    mov Blank, al
+;    mov Snake_Shape,' '
+;     
+;    mov bl,00
+;    
+;    mov dh,Head_Y
+;    mov dl,Head_X
+;    
+;    push bx  
+;    push dx
+;    call SetPoint
+;    
+;    mov al,Blank
+;    mov Snake_Shape,al 
+    
+    ;============
+    
     cmp Direction,1
     je up
     
@@ -138,19 +156,20 @@ proc SnakeMove
     je down
     
     cmp Direction,4
-    je left
+    je left 
     
     
-    up:
+    
+    up:;UP
     dec Head_Y
     jmp move 
-    right:
+    right:;RIGHT
     inc Head_X
     jmp move
-    down:
+    down:;DOWN
     inc Head_Y
     jmp move
-    left:
+    left:;DOWN
     dec Head_X
     
     
@@ -188,6 +207,7 @@ Direction db 2
 
 Snake_Color db 03h
 Snake_Shape db '*'
+Blank db ''
 SnakeArray dw dup(?)2000
 
 ;FOOD VALUE:
