@@ -91,10 +91,14 @@ proc SetUpSnake
   
        
        
+    mov cl,Snake_Shape
+    mov ch,Snake_Color
+    push cx
        
     mov dh,Head_Y
     mov dl,Head_X  
     push dx
+    
     call SetPoint 
     ret
 endp SetUpSnake
@@ -154,6 +158,9 @@ endp ClearAllReg
 proc SetPoint
     pop [150]
     pop dx;place dh = y; dl = x
+    
+    pop cx ;cl Shape, ch Color
+    
     mov al,dh;mov al y value
     mov bl,80d
     mul bl
@@ -165,8 +172,8 @@ proc SetPoint
      
     push ds
     
-    mov cl,Snake_Shape;shape 
-    mov ch,Snake_Color ;color
+    ;mov cl,Snake_Shape;shape 
+    ;mov ch,Snake_Color ;color
     mov ax, 0b800h
     mov ds,ax
     ;mov bx,1
@@ -273,6 +280,10 @@ proc SnakeMove
     
     
     move:
+    mov cl,Snake_Shape
+    mov ch,Snake_Color
+    push cx
+    
     mov dh,Head_Y
     mov dl,Head_X 
     push dx
@@ -310,7 +321,9 @@ endp CheckLose
 
 
 
-ret
+ret  
+
+;========VARS========
 
 Head_X db 1  
 
@@ -322,16 +335,33 @@ Tail_Y db 1
 
 Direction db 2 
 
+
+Blank db ''
+
+SnakeArray dw 2000 dup(?)
+
+Points db 0d
+
+
+
+;===============SETTINGS================
+
+;SNAKE PROPERTIES:
+
 Snake_Color db 11
 Snake_Shape db '*'
-Blank db ''
-SnakeArray dw dup(?)2000
 
 ;FOOD VALUE:
 
-Berry db 10d;*
-Apple db 20d;@
-Waffels db 30d;#
+P_Berry db 10d;*
+P_Apple db 20d;@
+P_Waffels db 30d;#
+
+;FOOD SHAPE:
+
+S_Berry db '*'
+S_Apple db '@'
+S_Waffels db '#'
 
 
 
