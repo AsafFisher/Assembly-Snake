@@ -16,12 +16,9 @@ proc SetUpSnake
     
     BuildField:
     
-    ;Drow the top border
-    T_drow:
     mov bh, 0
     mov ah, 0x2
-    int 0x10 ;set mod 
-    
+    int 0x10 
     ; dh = y
 ;     dl = x 
     mov dl,0
@@ -47,14 +44,9 @@ proc SetUpSnake
     cmp dh,25d
     jne L_drow 
           
-    
-    mov dl,79
-    mov dh,0
-     
-    R_drow:
-    
-    
-     
+    mov al,79
+    mov dh,0 
+    R_drow: 
     mov cx, 1 ; print chars
     mov bh, 0
     mov bl, 20d ;  bg/fg
@@ -66,26 +58,6 @@ proc SetUpSnake
     int 0x10
     cmp dh,25d
     jne R_drow
-    
-     
-    
-    B_drow:
-    mov dl,0
-    mov dh,24
-    
-    mov ah, 0x2
-    int 0x10
-    
-    
-    mov cx, 80 ; print chars
-    mov bh, 0
-    mov bl, 20d ; green bg/blue fg
-    mov al, ' ';'*';0x20 ; blank char
-    mov ah, 0x9
-    int 0x10
-    
-    
-    
     
     
   
