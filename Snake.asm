@@ -139,6 +139,7 @@ proc ClearAllRegAndVars
     mov Tail_X,1
     mov Tail_Y,1
     mov HeadDirection,2
+    mov TailDirection,2
     mov Points,0d
     
     ret 
@@ -239,7 +240,7 @@ proc GetPoint;Return to stack high-Color Low-Shape
 endp GetPoint
 
 
-;TODO:
+;WORNING- May be a problem with Turns array problem and his word size
 proc CheckDirectionChange 
     ;check if keyboard clicked
     
