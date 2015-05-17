@@ -17,9 +17,9 @@ hlt
 ;=================================================================================================
 proc SetUpSnake
     ClearField:
-    mov dl,0
+    mov dl,0 ;set cursor to 0,0
     mov dh,0  
-    clear:
+    clear: ;clear the console...
     mov bh, 0
     mov ah, 0x2
     int 0x10
@@ -30,17 +30,16 @@ proc SetUpSnake
     mov ah, 0x9
     int 0x10
     inc dh
-    
     cmp dh,25d
     jne clear
     
-    mov dl,0
+    mov dl,0 ;set cursor to 0,0
     mov dh,0
     
     BuildField:
     
     ;Drow the top border
-    T_drow:
+    T_draw:
     mov bh, 0
     mov ah, 0x2
     int 0x10 ;set mod 
@@ -57,7 +56,7 @@ proc SetUpSnake
     mov ah, 0x9
     int 0x10
      
-    L_drow:    
+    L_draw: ;draw the left border   
     inc dh
     mov cl,' '
     mov ch,20d
@@ -74,7 +73,7 @@ proc SetUpSnake
     mov dl,79
     mov dh,0
      
-    R_drow:
+    R_draw: ;draw the right border
     inc dh
     mov cl,' '
     mov ch,20d
@@ -84,11 +83,11 @@ proc SetUpSnake
     call SetPoint
     pop dx
     cmp dh,25d
-    jne R_drow
+    jne R_draw
     
      
     
-    B_drow:
+    B_draw: ;draw the buttom border
     mov bh, 0
     mov ah, 0x2
     int 0x10
@@ -110,7 +109,7 @@ proc SetUpSnake
     
     
     
-  
+    ;place the snake...
        
        
     mov cl,Snake_Shape
@@ -188,7 +187,7 @@ proc SetPoint
     pop dx;place dh = y; dl = x
     
     pop cx ;cl Shape, ch Color
-    
+    ;change the dh and dl to one number algorithem...
     mov al,dh;mov al y value
     mov bl,80d
     mul bl
@@ -198,7 +197,7 @@ proc SetPoint
     add ax,dx
     mov bx,ax        
      
-    push ds
+    push ds ;move data seg to 0b800h
     
     ;mov cl,Snake_Shape;shape 
     ;mov ch,Snake_Color ;color
@@ -211,7 +210,7 @@ proc SetPoint
     ret
 endp SetPoint
 
-proc GetPoint;Return to stack high-Color Low-Shape
+proc GetPoint;Return the char in certain place get value from stack and return to stack high-Color Low-Shape
     pop [150]
     pop dx;place dh = y; dl = x
     
@@ -240,7 +239,7 @@ proc GetPoint;Return to stack high-Color Low-Shape
 endp GetPoint
 
 
-;WORNING- May be a problem with Turns array problem and his word size
+;WORNING- May be a problem with Turns array problem and his word size [si+2]
 proc CheckDirectionChange 
     ;check if keyboard clicked
     
@@ -375,7 +374,7 @@ proc CheckDirectionChange
     
 endp CheckDirectionChange 
    
-   
+ ;working Snake eatten might be an error with labels location....  
 proc SnakeMove
     ;============ 
     
@@ -385,7 +384,7 @@ proc SnakeMove
 ;     
 ;    mov bl,00
 ;    
-    cmp IsSnakeEatten,1
+    cmp IsSnakeEatten,1;check is snake eatten
     je skip
            
     cmp Turns_Length,0
