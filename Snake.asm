@@ -67,7 +67,7 @@ proc SetUpSnake
     pop dx
     cmp dh,25d               
      
-    jne L_drow 
+    jne L_draw 
           
     
     mov dl,79
