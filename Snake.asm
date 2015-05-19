@@ -6,10 +6,14 @@ call SetUpSnake
 Step:
 ;call CheckDirectionChange 
 call SnakeMove
+call IsSnakeEaten
 pop ax
 cmp ax,1
 je MainManue
 call CheckDirectionChange
+
+
+
 ;call CheckWin
 jmp Step
 
@@ -535,6 +539,10 @@ proc SnakeMove
     
     move:
     
+    ;Check if snake eaten...
+    call IsSnakeEaten
+    
+    ;Check if game lost...
     call CheckLose
     pop ax
     cmp ax,1
@@ -560,6 +568,52 @@ proc SnakeMove
     
     ret
 endp SnakeMove
+
+
+proc IsSnakeEaten
+    xor ax,ax
+    
+    mov dh,Head_Y
+    mov dl,Head_X
+              
+    push dx
+    call GetPoint
+    pop cx
+    cmp cl,S_Berry
+    je berry
+    cmp cl,S_Apple
+    je apple
+    cmp cl,S_Waffels
+    je waffels
+    jmp none
+    
+    berry:
+    mov al,P_Berry
+    add Points,ax
+    jmp eated
+    apple:
+    mov al,P_Apple
+    add Points,ax
+    jmp eated        
+            
+    waffels:
+    mov al,P_Waffels
+    add Points,ax
+    
+    
+    eated:
+    mov ax,Points
+    daa al
+    mov Points,ax
+    jmp none
+    mov IsSnakeEatten,1
+    
+    
+    none:
+    
+    
+    ret
+endp IsSnakeEaten
 
 proc CheckLose
     
@@ -649,7 +703,7 @@ IsSnakeEatten db 0
  
  
 ;Values 
-Points db 0d
+Points dw 0d
 
 
 
