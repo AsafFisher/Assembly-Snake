@@ -1,12 +1,44 @@
+;========MACROS=======
+random macro range
+    mov ah,00h
+    int 1Ah
+    mov ax,dx
+    xor dx,dx
+    mov bx, range
+    div bx
+    inc dx   
+endm
+;========================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 org 100h
 MainManue:
 call ClearAllRegAndVars
 
 call SetUpSnake
 Step:
+MOV     CX, 0FH
+MOV     DX, 4240H
+MOV     AH, 86H
+INT     15H
+MOV     CX, 0FH
+MOV     DX, 4240H
+MOV     AH, 86H
+INT     15H
 ;call CheckDirectionChange 
 call SnakeMove
-call IsSnakeEaten
 pop ax
 cmp ax,1
 je MainManue
@@ -124,7 +156,11 @@ proc SetUpSnake
     mov dl,Head_X  
     push dx
     
-    call SetPoint 
+    call SetPoint
+    
+    ;place the snake food...
+    call GenerateNewFood
+     
     ret
 endp SetUpSnake
 
@@ -217,6 +253,7 @@ endp SetPoint
 proc GetPoint;Return the char in certain place get value from stack and return to stack high-Color Low-Shape
     pop [150]
     pop dx;place dh = y; dl = x
+    push [150]
     
     mov al,dh;mov al y value
     mov bl,80d
@@ -234,6 +271,7 @@ proc GetPoint;Return the char in certain place get value from stack and return t
     ;mov bx,1
     mov cx,[bx] 
     pop ds
+    pop [150]
     push cx
     push [150] 
     
@@ -275,12 +313,14 @@ proc CheckDirectionChange
     cmp Turns_Length,0
     je Add_Turn1
     mov si,[Turns_Length]
+    add si,si
     inc si
     mov al,HeadDirection
     mov ah,Snake_Size
-    mov dx,Turns[si-1]
+    mov dx,Turns[si-2]
     sub ah,dh
     mov Turns[si],ax
+    inc Turns_Length
     jmp Knone
     Add_Turn1:
     mov si,[Turns_Length]
@@ -301,12 +341,14 @@ proc CheckDirectionChange
     cmp Turns_Length,0
     je Add_Turn2
     mov si,[Turns_Length]
+    add si,si 
     inc si
     mov al,HeadDirection
     mov ah,Snake_Size
-    mov dx,Turns[si-1]
+    mov dx,Turns[si-2]
     sub ah,dh
     mov Turns[si],ax
+    inc Turns_Length
     jmp Knone
     Add_Turn2:
     mov si,[Turns_Length]
@@ -330,12 +372,14 @@ proc CheckDirectionChange
     cmp Turns_Length,0
     je Add_Turn3
     mov si,[Turns_Length]
+    add si,si
     inc si
     mov al,HeadDirection
     mov ah,Snake_Size
-    mov dx,Turns[si-1]
+    mov dx,Turns[si-2]
     sub ah,dh
     mov Turns[si],ax
+    inc Turns_Length
     jmp Knone
     Add_Turn3:
     mov si,[Turns_Length]
@@ -356,12 +400,14 @@ proc CheckDirectionChange
     cmp Turns_Length,0
     je Add_Turn4
     mov si,[Turns_Length]
+    add si,si
     inc si
     mov al,HeadDirection
     mov ah,Snake_Size
-    mov dx,Turns[si-1]
+    mov dx,Turns[si-2]
     sub ah,dh
     mov Turns[si],ax
+    inc Turns_Length
     jmp Knone
     Add_Turn4:
     mov si,[Turns_Length]
@@ -432,7 +478,7 @@ proc SnakeMove
     mov TailDirection,4
     
     RemoveTurnFromArray:
-    mov si,0
+    mov si,1
     cmp Turns_Length,1
     ja conti 
     
@@ -445,9 +491,9 @@ proc SnakeMove
     mov cx,Turns_Length
     dec cx 
     SortArray:
-    mov ax,Turns[si+1]
+    mov ax,Turns[si+2]
     mov Turns[si],ax
-    inc si
+    add si,2
     loop SortArray
     dec Turns_Length 
     
@@ -493,6 +539,17 @@ proc SnakeMove
     dec Tail_X
     
     skip:
+    cmp IsSnakeEatten,1
+    je IncSnake
+    jmp next
+    
+    
+    IncSnake:
+    mov IsSnakeEatten,0
+    inc Snake_Size
+    
+    next:
+    
     
     
     
@@ -602,11 +659,9 @@ proc IsSnakeEaten
     
     
     eated:
-    mov ax,Points
-    daa al
-    mov Points,ax
-    jmp none
     mov IsSnakeEatten,1
+    
+    call GenerateNewFood
     
     
     none:
@@ -614,6 +669,64 @@ proc IsSnakeEaten
     
     ret
 endp IsSnakeEaten
+
+proc GenerateNewFood
+    getY: 
+    random Field_Y
+    mov T_F_Y,dl
+    cmp T_F_Y,0
+    je getY
+    cmp T_F_Y,24d
+    jae getY
+    getX:
+    random Field_X
+    mov T_F_X,dl
+    cmp T_F_X,80d
+    je getX
+    
+    random 3d
+    cmp dl,1
+    je PlaceBerry
+    cmp dl,2
+    je PlaceApple
+    cmp dl,3
+    je PlaceWaffels
+    
+    PlaceBerry:
+    mov ch,C_Berry;mov food color
+    mov cl,S_Berry;mov food shape
+    jmp place 
+    
+    PlaceApple:
+    mov ch,C_Apple
+    mov cl,S_Apple
+    jmp place 
+    
+    PlaceWaffels:
+    mov ch,C_Waffels
+    mov cl,S_Waffels
+    
+    place:
+    
+    mov dh,T_F_Y
+    mov dl,T_F_X
+    
+    
+    push cx;shape,color
+    push dx;x,y
+    call SetPoint
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    ret
+endp
+
 
 proc CheckLose
     
@@ -672,7 +785,11 @@ endp GameOver
 
 
 
-ret  
+ret
+
+
+
+  
 
 ;========VARS========
 ;Cords
@@ -722,9 +839,24 @@ P_Waffels db 30d;#
 
 ;FOOD SHAPE:
 
-S_Berry db '*'
+S_Berry db 0ebh
 S_Apple db '@'
 S_Waffels db '#'
+;FOOD COLOR:
+C_Berry db 05h
+C_Apple db 04h
+C_Waffels db 06h
+
+
+
+;Temp food location:
+T_F_Y db ?
+T_F_X db ?
+
+;Size of the field..
+Field_Chars dw 2000d
+Field_X dw 80d
+Field_Y dw 25d
 
  
  
