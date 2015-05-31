@@ -222,10 +222,12 @@ proc SetPoint
     ret
 endp SetPoint
 proc Sleep
+    pusha
     MOV CX, 02H;0fh
     MOV DX, 4240H
     MOV AH, 86H
     INT 15H
+    popa
     ret
 endp Sleep
 
@@ -282,7 +284,7 @@ proc CheckDirectionChange
     je Kright
     cmp al,'s'
     je Kdown
-    cmp al,20
+    cmp al,20h
     jne Knone
     hlt
     
@@ -292,7 +294,7 @@ proc CheckDirectionChange
     mov HeadDirection,1
     ;========Turns Alg=========
     cmp Turns_Length,0
-    je Add_Turn1
+    je Add_Turn1                                                                        
     mov si,[Turns_Length]
     add si,si
     inc si
@@ -607,7 +609,7 @@ proc SnakeMove
     push [150]
     ret
 endp SnakeMove
-;s
+
 
 proc IsSnakeEaten
     xor ax,ax
