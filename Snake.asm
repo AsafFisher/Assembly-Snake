@@ -17,26 +17,13 @@ endm
 
 
 
-
-
-
-
-
-
 org 100h
 MainManue:
 call ClearAllRegAndVars
 
 call SetUpSnake
 Step:
-MOV     CX, 0FH
-MOV     DX, 4240H
-MOV     AH, 86H
-INT     15H
-MOV     CX, 0FH
-MOV     DX, 4240H
-MOV     AH, 86H
-INT     15H
+call Sleep
 ;call CheckDirectionChange 
 call SnakeMove
 pop ax
@@ -167,22 +154,7 @@ endp SetUpSnake
 
 
 
-;clear all the registries
-proc ClearAllRegAndVars
-    xor ax,ax
-    xor bx,bx
-    xor dx,dx
-    xor cx,cx
-    mov Head_X,1
-    mov Head_Y,1
-    mov Tail_X,1
-    mov Tail_Y,1
-    mov HeadDirection,2
-    mov TailDirection,2
-    mov Points,0d
-    
-    ret 
-endp ClearAllReg
+
 ;===========================TESTS============================                      
 ;proc SetPoint;Use stack to cx ch=Colors cl= Letters Ascii  
 ;    pop [160]
@@ -249,6 +221,13 @@ proc SetPoint
     push [150]
     ret
 endp SetPoint
+proc Sleep
+    MOV CX, 02H;0fh
+    MOV DX, 4240H
+    MOV AH, 86H
+    INT 15H
+    ret
+endp Sleep
 
 proc GetPoint;Return the char in certain place get value from stack and return to stack high-Color Low-Shape
     pop [150]
@@ -303,7 +282,9 @@ proc CheckDirectionChange
     je Kright
     cmp al,'s'
     je Kdown
-    jmp Knone
+    cmp al,20
+    jne Knone
+    hlt
     
     Kup:
     cmp HeadDirection,1
@@ -621,11 +602,12 @@ proc SnakeMove
     ret
     
     PointDone:
-    
-    
+    pop [150]
+    push 0
+    push [150]
     ret
 endp SnakeMove
-
+;s
 
 proc IsSnakeEaten
     xor ax,ax
@@ -775,12 +757,47 @@ proc GameOver
     inc dh
     mov bp,offset MSG_GameOver4 
     int 10h
-    
+            
+            
+    mov cx,5
+    waitsec: 
+    call Sleep
+    loop waitsec
                         
     
     
     ret
-endp GameOver
+endp GameOver 
+
+
+
+;clear all the registries
+proc ClearAllRegAndVars
+    xor ax,ax
+    xor bx,bx
+    xor dx,dx
+    xor cx,cx
+    mov Head_X,1
+    mov Head_Y,1
+    mov Tail_X,1
+    mov Tail_Y,1
+    mov HeadDirection,2
+    mov TailDirection,2
+    mov Points,0d 
+    mov Snake_Size,1
+    mov cx,Turns_Length
+    add cx,cx
+    cmp cx,0
+    je noneValues 
+    resetArray:
+    mov si,cx
+    mov Turns[si],0         
+    loop resetArray;
+    mov Turns_Length,0                   
+    noneValues:
+    
+    ret 
+endp ClearAllReg
 ;====================
 
 
