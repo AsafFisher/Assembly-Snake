@@ -292,96 +292,36 @@ proc CheckDirectionChange
     cmp HeadDirection,1
     je Knone
     mov HeadDirection,1
-    ;========Turns Alg=========
-    cmp Turns_Length,0
-    je Add_Turn1                                                                        
-    mov si,[Turns_Length]
-    add si,si
-    inc si
-    mov al,HeadDirection
-    mov ah,Snake_Size
-    mov dx,Turns[si-2]
-    sub ah,dh
-    mov Turns[si],ax
-    inc Turns_Length
-    jmp Knone
-    Add_Turn1:
-    mov si,[Turns_Length]
-    inc si
-    mov al,HeadDirection
-    mov ah,Snake_Size
-    mov Turns[si],ax 
-    inc Turns_Length
-    ;===========================
-    jmp Knone
+    
+    jmp performDataTurn
     
     Kright:
     cmp HeadDirection,2
     je Knone
     mov HeadDirection,2
+
     
-    ;========Turns Alg=========
-    cmp Turns_Length,0
-    je Add_Turn2
-    mov si,[Turns_Length]
-    add si,si 
-    inc si
-    mov al,HeadDirection
-    mov ah,Snake_Size
-    mov dx,Turns[si-2]
-    sub ah,dh
-    mov Turns[si],ax
-    inc Turns_Length
-    jmp Knone
-    Add_Turn2:
-    mov si,[Turns_Length]
-    inc si
-    mov al,HeadDirection
-    mov ah,Snake_Size
-    mov Turns[si],ax
-    inc Turns_Length 
-    ;===========================
-    
-    
-    
-    jmp Knone
+    jmp performDataTurn
           
     Kdown:
     cmp HeadDirection,3
     je Knone
     mov HeadDirection,3
     
-    ;========Turns Alg=========
-    cmp Turns_Length,0
-    je Add_Turn3
-    mov si,[Turns_Length]
-    add si,si
-    inc si
-    mov al,HeadDirection
-    mov ah,Snake_Size
-    mov dx,Turns[si-2]
-    sub ah,dh
-    mov Turns[si],ax
-    inc Turns_Length
-    jmp Knone
-    Add_Turn3:
-    mov si,[Turns_Length]
-    inc si
-    mov al,HeadDirection
-    mov ah,Snake_Size
-    mov Turns[si],ax
-    inc Turns_Length 
-    ;===========================
-    jmp Knone
+  
+    jmp performDataTurn
     
     Kleft:
     cmp HeadDirection,4
     je Knone
     mov HeadDirection,4
+    
+    
+    performDataTurn:
      
      ;========Turns Alg=========
     cmp Turns_Length,0
-    je Add_Turn4
+    je Add_Turn
     mov si,[Turns_Length]
     add si,si
     inc si
@@ -392,7 +332,7 @@ proc CheckDirectionChange
     mov Turns[si],ax
     inc Turns_Length
     jmp Knone
-    Add_Turn4:
+    Add_Turn:
     mov si,[Turns_Length]
     inc si
     mov al,HeadDirection
