@@ -1,4 +1,4 @@
-;========MACROS=======
+;========MACROS======= ; MADE BY ASAF FISHER (C)
 random macro range
     mov ah,00h
     int 1Ah
@@ -286,7 +286,8 @@ proc CheckDirectionChange
     je Kdown
     cmp al,20h
     jne Knone
-    hlt
+    MOV AX, 4C00h
+    int 21h
     
     Kup:
     cmp HeadDirection,1
