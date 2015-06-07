@@ -18,12 +18,32 @@ endm
 
 
 org 100h
-MainManue:
+MainMenu:
+call ClearAllRegAndVars
 call DrawMainMenu
 call FunctionalMainMenu
+pop ax
+cmp ax,1
+je StartTheGame
+cmp ax,2
+je MoreOptions
+cmp ax,3
+je Exit 
 
+jmp MainMenu
+
+Exit:
+MOV AX, 4C00h
+int 21h
+
+
+MoreOptions:
+
+
+
+
+StartTheGame:
 call ClearAllRegAndVars
-
 call SetUpSnake
 Step:
 call Sleep
@@ -31,7 +51,7 @@ call Sleep
 call SnakeMove
 pop ax
 cmp ax,1
-je MainManue
+je MainMenu
 call CheckDirectionChange
 
 
@@ -57,6 +77,9 @@ proc FunctionalMainMenu
     je UpKey
     cmp ah,50h ;down key
     je DownKey
+    cmp al,13
+    je OptionClicked
+    jmp Options
     
     UpKey:
     cmp OptionsPosition,1
@@ -128,6 +151,14 @@ proc FunctionalMainMenu
     
 
     jmp Options
+    
+    
+    OptionClicked: 
+    xor ax,ax
+    pop [150]
+    mov al, OptionsPosition
+    push ax
+    push [150] 
 
     ret
 endp FunctionalMainMenu    
@@ -563,8 +594,8 @@ proc CheckDirectionChange
     je Kdown
     cmp al,20h
     jne Knone
-    MOV AX, 4C00h
-    int 21h
+    pop dx
+    jmp MainMenu
     
     Kup:
     cmp HeadDirection,1
