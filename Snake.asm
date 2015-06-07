@@ -19,6 +19,9 @@ endm
 
 org 100h
 MainManue:
+call DrawMainMenu
+call FunctionalMainMenu
+
 call ClearAllRegAndVars
 
 call SetUpSnake
@@ -38,23 +41,270 @@ jmp Step
 
 hlt
 ;=================================================================================================
-proc SetUpSnake
-    ClearField:
-    mov dl,0 ;set cursor to 0,0
-    mov dh,0  
-    clear: ;clear the console...
-    mov bh, 0
-    mov ah, 0x2
-    int 0x10
-    mov cx, 80 ; print chars
-    mov bh, 0
-    mov bl, 00d ; green bg/blue fg
-    mov al, 0;'*';0x20 ; blank char
-    mov ah, 0x9
-    int 0x10
+proc FunctionalMainMenu
+    
+    Options:
+     mov ah,1h ;Check if any key was pressed in the keyboard!
+    int 16h
+    jnz UpOrDown;key was pressed!
+    jmp Options ;key wasent pressed!
+    
+    UpOrDown:
+    mov ah,0h;Get the key that was pressed!
+    int 16h
+    
+    cmp ah,48h ;up key
+    je UpKey
+    cmp ah,50h ;down key
+    je DownKey
+    
+    UpKey:
+    cmp OptionsPosition,1
+    je Buttom
+    mov dh,OptionsPosition
+    mov dl,0
+    push dx
+    call ChangeManuPosition
+    
+    dec OptionsPosition
+    
+    mov dh,OptionsPosition
+    mov dl,1
+    push dx
+    call ChangeManuPosition
+    jmp Options
+    
+    ;upper then 1?
+    Buttom:
+    
+    mov dh,OptionsPosition  ;unmark befor
+    mov dl,0
+    push dx
+    call ChangeManuPosition
+    
+    mov OptionsPosition,3
+     
+    mov dh,OptionsPosition    ;mark after
+    mov dl,1
+    push dx
+    call ChangeManuPosition
+    
+    
+    
+    
+    jmp Options
+    
+    DownKey:
+    
+    cmp OptionsPosition,3
+    je Top
+    mov dh,OptionsPosition
+    mov dl,0
+    push dx
+    call ChangeManuPosition
+    
+    inc OptionsPosition
+    
+    mov dh,OptionsPosition
+    mov dl,1 
+    push dx
+    call ChangeManuPosition
+    jmp Options
+    
+    ;lower then 3?
+    Top:
+    
+    mov dh,OptionsPosition  ;unmark befor
+    mov dl,0
+    push dx
+    call ChangeManuPosition
+    
+    mov OptionsPosition,1
+     
+    mov dh,OptionsPosition    ;mark after
+    mov dl,1
+    push dx
+    call ChangeManuPosition
+    
+
+    jmp Options
+
+    ret
+endp FunctionalMainMenu    
+
+;chnage the selected menu item...
+;get param in stack High- Option kind. Low- 0=true 1=false
+proc ChangeManuPosition
+    pop [150]
+    pop dx
+    cmp dh,1
+    je SC
+    cmp dh,2
+    je MOC
+    cmp dh,3
+    
+    ;Exit Unmark/mark
+    EC:
+    cmp dl,1
+    je ECmark
+    ECunmark:;unmark
+    mov dx,ELLocation 
+    mov bp,offset ExitLabelFalse 
+    
+    jmp doneMarking
+    
+    
+    ECmark:;mark
+    mov dx,ELLocation 
+    mov bp,offset ExitLabelTrue
+    
+    jmp doneMarking
+    
+    ;Start unmark/mark
+    SC:
+    cmp dl,1
+    je SCmark
+    SCunmark:;unmark
+    mov dx,SLLocation 
+    mov bp,offset StartLabelFalse
+    jmp doneMarking
+    
+    
+    SCmark:;mark
+    
+    mov dx,SLLocation 
+    mov bp,offset StartLabelTrue
+    
+    jmp doneMarking
+    
+    ;More Options mark/unmark
+    MOC:
+    cmp dl,1
+    je MOCmark
+    MOCunmark:;unmark
+    mov dx,OLLocation 
+    mov bp,offset OptionsLabelFalse
+    jmp doneMarking
+    
+    
+    MOCmark:;mark
+    mov dx,OLLocation 
+    mov bp,offset OptionsLabelTrue
+    
+    doneMarking:
+    
+    mov bh,0
+    mov ah,13h
+    mov al,0 
+    mov bl,10
+    mov cx,16d
+    int 10h
+    push [150]
+    ret    
+endp ChangeManuPosition
+proc DrawMainMenu
+    call ClearScreen
+    TitleMsg:
+    mov bh,0
+    mov ah,13h
+    mov al,0
+    mov dh,1
+    mov dl,13 
+    mov bl,10
+    mov cx,52d
+    mov bp,offset T1 
+    int 10h 
     inc dh
-    cmp dh,25d
-    jne clear
+    mov bp,offset T2 
+    int 10h
+    inc dh
+    mov bp,offset T3 
+    int 10h
+    inc dh
+    mov bp,offset T4 
+    int 10h 
+    inc dh
+    mov bp,offset T5 
+    int 10h
+    inc dh
+    mov bp,offset T6 
+    int 10h
+    inc dh
+    mov bp,offset T7 
+    int 10h
+    inc dh
+    mov bp,offset T8 
+    int 10h
+    inc dh
+    mov bp,offset T9 
+    int 10h
+    inc dh
+    mov bp,offset T10 
+    int 10h
+    inc dh
+    mov bp,offset T11 
+    int 10h
+            
+            
+    mov cx,10
+    waitsec2: 
+    call Sleep
+    loop waitsec2
+     
+    mov bh,0
+    mov ah,13h
+    mov al,0
+    mov dl,32d
+    add dh,3d
+    mov bl,10
+    mov cx,16d
+    mov bp,offset StartLabelTrue
+    int 10h
+    mov SLLocation,dx
+    
+    add dh,3
+    mov bp,offset OptionsLabelFalse
+    int 10h
+    mov OLLocation,dx
+    add dh,3
+    mov bp,offset ExitLabelFalse
+    int 10h
+    mov ELLocation,dx 
+    
+    
+    
+    
+          
+    
+    ;call SetPoint
+    
+    
+    ret
+endp DrawMainMenu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+proc SetUpSnake
+    
+    call ClearScreen
     
     mov dl,0 ;set cursor to 0,0
     mov dh,0
@@ -151,6 +401,27 @@ proc SetUpSnake
     ret
 endp SetUpSnake
 
+proc ClearScreen
+ClearField:
+    mov dl,0 ;set cursor to 0,0
+    mov dh,0  
+    clear: ;clear the console...
+    mov bh, 0
+    mov ah, 0x2
+    int 0x10
+    mov cx, 80 ; print chars
+    mov bh, 0
+    mov bl, 00d ; green bg/blue fg
+    mov al, 0;'*';0x20 ; blank char
+    mov ah, 0x9
+    int 0x10
+    inc dh
+    cmp dh,25d
+    jne clear
+    ret
+    
+endp ClearScreen
+
 
 
 
@@ -193,8 +464,14 @@ endp SetUpSnake
 ;    ret
 ;endp SetPoint
 ;===========================TESTS==============================
- 
+
+
+
+
 proc SetPoint
+    ; Get params to stack, first parameter that you need to push
+    ; is the shape and the second one is the location...
+    
     pop [150]
     pop dx;place dh = y; dl = x
     
@@ -782,6 +1059,10 @@ IsSnakeEatten db 0
 ;Values 
 Points dw 0d
 
+;MainMenu
+
+OptionsPosition db 1
+
 
 
 ;===============SETTINGS================
@@ -820,15 +1101,51 @@ Field_Y dw 25d
 
  
  
-;===============STRINGS===============
+;===============STRINGS=============== 
+
+;GAME OVER MSG:
 
 MSG_GameOver1 db "  ___   __   _  _  ____     __   _  _  ____  ____ " 
 MSG_GameOver2 db " / __) / _\ ( \/ )(  __)   /  \ / )( \(  __)(  _ \"
 MSG_GameOver3 db "( (_ \/    \/ \/ \ ) _)   (  O )\ \/ / ) _)  )   /"
 MSG_GameOver4 db " \___/\_/\_/\_)(_/(____)   \__/  \__/ (____)(__\_)" 
 
-GO_Len equ $ - MSG_GameOver             
+;GO_Len equ $ - MSG_GameOver 
+
+;WELCOME TITLE:
+
 
           
 
+T1 db  "  _______ _             _____             _         "
+T2 db  " |__   __| |           / ____|           | |        "
+T3 db  "    | |  | |__   ___  | (___  _ __   __ _| | _____  "
+T4 db  "    | |  | '_ \ / _ \  \___ \| '_ \ / _` | |/ / _ \ "
+T5 db  "    | |  | | | |  __/  ____) | | | | (_| |   <  __/ "
+T6 db  "   _|_|_ |_| |_|\___| |_____/|_| |_|\__,_|_|\_\___| "
+T7 db  "  / ____|                    | |                    "
+T8 db  " | |  __  __ _ _ __ ___   ___| |                    "
+T9 db  " | | |_ |/ _` | '_ ` _ \ / _ \ |                    "
+T10 db " | |__| | (_| | | | | | |  __/_|                    "
+T11 db "  \_____|\__,_|_| |_| |_|\___(_)                    "
+T_Len equ $ - T1
 
+
+
+
+;MainMenu Options:
+
+StartLabelFalse db   " Start The Game "
+StartLabelTrue db    ">Start The Game<"
+;Var
+SLLocation dw ?
+
+OptionsLabelFalse db "  More Options  "
+OptionsLabelTrue db  " >More Options< " 
+;Var
+OLLocation dw ?
+
+ExitLabelFalse db    "     Exit       "
+ExitLabelTrue db     "    >Exit<      "
+;Var
+ELLocation dw ?                                                                                   
