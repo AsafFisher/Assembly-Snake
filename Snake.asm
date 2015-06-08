@@ -629,29 +629,16 @@ proc CheckDirectionChange
     performDataTurn:
      
      ;========Turns Alg=========
-    cmp Turns_Length,0
-    je Add_Turn
     mov si,[Turns_Length]
+    mov al,HeadDirection
+    mov Turns[si],al
     add si,si
-    inc si
-    mov al,HeadDirection
-    mov ah,Snake_Size
-    mov dx,Turns[si-2]
-    sub ah,dh
-    mov Turns[si],ax
+    mov al,Head_X
+    mov ah,Head_Y
+    mov Locations[si],ax
     inc Turns_Length
-    jmp Knone
-    Add_Turn:
-    mov si,[Turns_Length]
-    inc si
-    mov al,HeadDirection
-    mov ah,Snake_Size
-    mov Turns[si],ax
-    inc Turns_Length 
     ;===========================
-    
-    Knone:
-     
+    Knone: 
     ret
     
 endp CheckDirectionChange 
@@ -671,50 +658,26 @@ proc SnakeMove
            
     cmp Turns_Length,0
     je RemoveTail
-    mov si,1
-    mov ax,Turns[si]
+    mov si,0;Current Turn...
+    mov ax,Locations[si]
+    cmp Tail_X,al
+    jne RemoveTail
+    cmp Tail_Y,ah
+    jne RemoveTail
     
-    dec ah
-    mov Turns[si],ax
-    
-    cmp ah,0
-    je ChangeTailDirection
-    
-    jmp RemoveTail
      
     ChangeTailDirection:
-    ;up
-    cmp al,1
-    je Tail_Up
-    cmp al,2
-    je Tail_Right
-    cmp al,3
-    je Tail_Down
-    cmp al,4
-    je Tail_Left
-    
-    
-    Tail_Up:
-    mov TailDirection,1
-    jmp RemoveTurnFromArray
-    
-    Tail_Right:
-    
-    mov TailDirection,2
-    jmp RemoveTurnFromArray
-    
-    Tail_Down:
-    mov TailDirection,3
-    jmp RemoveTurnFromArray
-    Tail_Left:
-    mov TailDirection,4
+    ;up 
+    mov al,Turns[si]
+    mov TailDirection,al
     
     RemoveTurnFromArray:
-    mov si,1
+    mov si,0
     cmp Turns_Length,1
     ja conti 
     
-    mov Turns[si],0000h
+    mov Turns[si],00h
+    mov Locations[si],0000h
     dec Turns_Length
     jmp RemoveTail
     
@@ -722,11 +685,21 @@ proc SnakeMove
     
     mov cx,Turns_Length
     dec cx 
-    SortArray:
-    mov ax,Turns[si+2]
-    mov Turns[si],ax
+    SortLocationsArray:
+    mov ax,Locations[si+2]
+    mov Locations[si],ax
     add si,2
-    loop SortArray
+    loop SortLocationsArray
+    
+    mov si,0
+    mov cx,Turns_Length
+    dec cx 
+    SortTurnsArray:
+    mov al,Turns[si+1]
+    mov Turns[si],al
+    inc si
+    loop SortTurnsArray
+    
     dec Turns_Length 
     
     
@@ -737,7 +710,7 @@ proc SnakeMove
     
     RemoveTail:
     
-     mov cl,0
+    mov cl,0
     mov ch,0
     push cx
     
@@ -1077,7 +1050,8 @@ TailDirection db 2
 
 
 ;Blank db ''
-Turns dw 2000 dup(?)
+Turns db 2000 dup(?)
+Locations dw 2000 dup(?)
 Turns_Length dw 0
 
 Snake_Size db 1
