@@ -9,25 +9,30 @@ This Project is now **working** and operational.
 
 ### "FunctionalMainMenu"
 
-This proc responsable to the main menu and its functionality...
+This proc responsable to the main menu and its functionality...  
+takes no arguments...
 
 
 ###  "ChangeManuPosition"  
-Responsable to the change of the current seleted on the main menu...
+Responsable to the change of the current seleted on the main menu...  
+takes no arguments...
 
 
 
 ###  "DrawMainMenu"
-Draw the main menu for the first time...
+Draw the main menu for the first time...  
+takes no arguments...
 
 
 
 
 ### "SetUpSnake"
-Setup the snake for the first time...
+Setup the snake for the first time...  
+takes no arguments...
 
 ### ClearScreen
-Clear the screen.
+Clear the screen.  
+takes no arguments...
 
 ### SetPoint
 Set a point in location that has given...
@@ -38,7 +43,8 @@ for example:
 	call SetPoint ; set the point with the color and shape at the x,y possition...
 
 ### Sleep
-Uses int 15h to sleep for few milisecs
+Uses int 15h to sleep for few milisecs.  
+takes not arguments...
 
 ### GetPoint
 Uses the same method of SetPoint, the only diffrences are:
@@ -53,6 +59,9 @@ Uses the same method of SetPoint, the only diffrences are:
 	push ax
 	call GetPoint
 	pop cx ; cl = shape, ch = color
+
+
+### TODO:
 
 
 - CheckDirectionChange
