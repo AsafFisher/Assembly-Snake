@@ -3,7 +3,7 @@
 ;  Snake.asm
 ;  Snake
 ;
-;  Created by Asaf Fisher on [to be added].
+;  Created by Asaf Fisher on  6/5/2015.
 ;  Copyright © 2015 Asaf Fisher. All rights reserved.
 ;
 ;
