@@ -64,10 +64,10 @@ Uses the same method of SetPoint, the only diffrences are:
 ### TODO:
 
 
-- CheckDirectionChange
-- SnakeMove
-- IsSnakeEaten
-- GenerateNewFood
-- CheckLose
-- GameOver
-- ClearAllRegAndVars
+- ~~CheckDirectionChange~~
+- ~~SnakeMove~~
+- ~~IsSnakeEaten~~
+- ~~GenerateNewFood~~
+- ~~CheckLose~~
+- ~~GameOver~~
+- ~~ClearAllRegAndVars~~
