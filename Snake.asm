@@ -1,4 +1,15 @@
-;========MACROS======= ; MADE BY ASAF FISHER (C)
+;
+;
+;  Snake.asm
+;  Snake
+;
+;  Created by Asaf Fisher on [to be added].
+;  Copyright © 2015 Asaf Fisher. All rights reserved.
+;
+;
+;
+;
+;========MACROS======= 
 random macro range
     mov ah,00h
     int 1Ah
